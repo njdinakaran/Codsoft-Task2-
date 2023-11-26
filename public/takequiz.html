@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Take Quizzes</title>
+
+        <link rel="stylesheet" type="text/css" href="css/takequizstyle.css">
+        <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+    
+        <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    
+</head>
+<body>
+    
+
+    <header>
+    <p class="logo">Quizzy</p>
+    
+    <div>
+        <a onclick="movehome()" style="color: black;">Home <i class="fa-solid fa-house"></i></a>
+    </div>
+</header>
+
+    <div id="privateQuizzes">
+        <label for="quizId">Quiz ID:</label>
+        <input type="text" id="quizId" name="quizId">
+        <br><br>
+        <label for="quizPassword">Quiz Password:</label>
+        <input type="password" id="quizPassword" name="quizPassword">
+        <br><br>
+        <button onclick="joinPrivateQuiz()">Join Private Quiz</button>
+    </div>
+
+    <h1>Public Quizzes</h1>
+
+    <div id="publicQuizzes">
+    </div>
+
+    <script>
+        fetch('/quizzesByVisibility?visibility=public')
+            .then(response => response.json())
+            .then(quizzes => {
+                const publicQuizzesContainer = document.getElementById('publicQuizzes');
+                quizzes.forEach(quiz => {
+                    const quizElement = document.createElement('div');
+                    quizElement.innerHTML = `
+                    <p style="display: inline-block; margin-right: 20px;">Date: ${quiz.Date_created}</p>
+                <p style="display: inline-block; margin-right: 20px;">Quiz Name: <a href="/attendquiz.html?quizId=${quiz._id}" target="_blank">${quiz.quizName}</a></p>
+                <p style="display: inline-block;">Total Questions: ${quiz.totalQuestions}</p>
+            `;
+                    publicQuizzesContainer.appendChild(quizElement);
+                });
+            })
+            .catch(error => console.error('Error fetching public quizzes:', error));
+
+        function joinPrivateQuiz() {
+            const quizId = document.getElementById('quizId').value;
+
+            const quizPassword = document.getElementById('quizPassword').value;
+
+            fetch('/joinPrivateQuiz', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ quizId, quizPassword })
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    return response.json();
+                } else if (response.status === 401) {
+                    throw new Error('Incorrect quiz ID or password');
+                } else {
+                    throw new Error('Invalid Quiz Details');
+                }
+    })
+            .then(data => {
+                console.log('Response from server:', data);
+                if (data.myquizid) {
+            window.location.href = `/attendquiz.html?quizId=${data.myquizid}`;
+        } else {
+            console.log('Quiz name not found');
+        }
+            })
+            .catch(error => {
+        console.error('Error joining private quiz:', error);
+        alert(error.message);
+    });        }
+    </script>
+
+    <script>
+    function movehome() {
+        fetch('/movetohome', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.text())
+        .then(data => {
+            
+            console.log('Moving to home');
+
+            window.location.href = `/homepage.html?name=${data}`;
+        })
+        .catch(error => console.error('Error moving to home:', error));
+    }
+</script>
+        
+</body>
+</html>

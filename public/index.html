@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quizzy</title>
+
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;1,500&family=Roboto:ital,wght@0,300;1,300;1,700&display=swap" rel="stylesheet">
+
+
+
+
+</head>
+
+<body>
+ 
+
+    <header>
+        <a href="#" class="logo">Quizzy</a>
+
+        <ul class="navlist">
+            <li><a href="#" class="sin">Sign In</a></li>
+            <li><a href="#" class="sup">Sign Up</a></li>
+        </ul>
+
+        <div class="bx bx-menu" id="menu-icon"></div>
+    </header>
+<section class="hero">
+    <div class="hero-text">
+        <h1>Welcome to Quizzy!</h1>
+        <h3>Are you looking to engage your audience,students, or customers with fun and interactive quizzes?</h3>
+        <h2>Look no further than Quizzy! </h2>
+        <p>Our intuitive platform allows you to create and share engaging quizzes in just a few clicks.</p>
+
+        <a href="#">Get Started</a>
+    </div>
+
+    <div class="hero-img">
+        <img src="img/land.png">
+
+    </div>
+
+    <p id="cc">Website Created by By Dinakaran. <br>For any issues or inquiries, please contact us at dina25210314@gmail.com </p>
+
+</section>
+
+<script src="https://unpkg.com/scrollreveal"></script>
+    <script src="js/script.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector("li:nth-of-type(1) a").addEventListener("click", function() {
+                window.location.href="signin.html";
+            });
+
+            document.querySelector("li:nth-of-type(2) a").addEventListener("click", function() {
+                window.location.href="register.html";
+            });
+
+            document.querySelector(".hero-text a").addEventListener("click", function() {
+                window.location.href="register.html";
+            });
+        });
+    </script>
+</body>
+</html>

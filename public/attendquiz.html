@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attend Quiz</title>
+    <link rel="stylesheet" type="text/css" href="css/attendquizstyle.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;1,500&family=Roboto:ital,wght@0,300;1,300;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">Quizzy</a>
+
+        <a onclick="movehome()" style="color: black; font-weight: bold;">Home <i class="fa-solid fa-house"></i></a>
+        
+
+    </header>
+    <h1 id="quizName"></h1>
+    <h2 id="questionDisplay"></h2>
+    <div id="optionsDisplay"></div>
+    <button onclick="nextQuestion()">Next Question</button>
+
+    <script>
+        let currentQuestionIndex = 0;
+        let quizQuestions = [];
+        let selectedAnswers = [];
+        let totalScore = 0;
+
+        var myqname="";
+        var myownername="";
+        var myowneremail="";
+
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const quizId = urlParams.get('quizId');
+
+        fetch(`/quizDetails?quizId=${quizId}`)
+            .then(response => response.json())
+            .then(quiz => {
+                myqname = quiz.quizName;
+                myownername=quiz.userName;
+                myowneremail=quiz.userEmail;
+                const quizNameElement = document.getElementById('quizName');
+                quizNameElement.textContent = `Quiz Name: ${myqname}`;
+                quizQuestions = quiz.questions;
+                console.log(quiz.questions);
+                displayQuestion();
+            })
+            .catch(error => console.error('Error fetching quiz details:', error));
+
+        function displayQuestion() {
+            const questionDisplay = document.getElementById('questionDisplay');
+            const optionsDisplay = document.getElementById('optionsDisplay');
+            const currentQuestion = quizQuestions[currentQuestionIndex];
+
+            questionDisplay.textContent = 'Question: '+currentQuestion.question;
+
+            optionsDisplay.innerHTML = '';
+            currentQuestion.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                const radioBtn = document.createElement('input');
+                radioBtn.setAttribute('type', 'radio');
+                radioBtn.setAttribute('name', 'answer');
+                radioBtn.setAttribute('value', option);
+                radioBtn.setAttribute('id', `option${index + 1}`);
+                radioBtn.onclick = () => {
+                    selectedAnswers[currentQuestionIndex] = option;
+                    console.log('User selected:', selectedAnswers[currentQuestionIndex]);
+                };
+
+                const label = document.createElement('label');
+                label.setAttribute('for', `option${index + 1}`);
+                label.textContent = option;
+
+                optionElement.appendChild(radioBtn);
+                optionElement.appendChild(label);
+
+                optionsDisplay.appendChild(optionElement);
+            });
+        }
+
+        function nextQuestion() {
+            console.log('button clicked');
+            if (selectedAnswers[currentQuestionIndex]) {
+                console.log('User selected:', selectedAnswers[currentQuestionIndex]);
+
+                if (currentQuestionIndex < quizQuestions.length - 1) {
+                    currentQuestionIndex++;
+                    displayQuestion();
+
+                } else {
+                    const submitButton = document.createElement('button');
+        submitButton.textContent = 'Submit Quiz';
+        submitButton.onclick = submitQuiz;
+        optionsDisplay.appendChild(submitButton);
+                    alert('Quiz has ended,Click Submit');
+                }
+            } else {
+                alert('Please select an answer before proceeding.');
+            }
+        }
+
+        function submitQuiz() {
+    let score = 0;
+    console.log('Total questions:', quizQuestions.length);
+
+    for (let i = 0; i < quizQuestions.length; i++) {
+        console.log('User answer:', selectedAnswers[i]);
+        console.log('Correct answer:', quizQuestions[i].correctAnswer);
+
+        if (selectedAnswers[i] === quizQuestions[i].correctAnswer) {
+            score++;
+        }
+    }
+
+    totalScore = score;
+    movehome();
+    alert(`Your total score is ${totalScore}`);
+
+    const data = {
+        quizAId: quizId,
+        quizName: myqname,
+        ownerName: myownername,
+        ownerEmail: myowneremail,
+        attemptedDate: new Date().toLocaleDateString('en-GB'),
+        questions: quizQuestions.map((question, i) => ({
+            question: question.question,
+            options: question.options,
+            correctAnswer: question.correctAnswer,
+            choosedAnswer: selectedAnswers[i],
+        })),
+        totalScore: totalScore,
+    };
+
+    fetch('/submitAttendQuizData', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: text.stringify(data),
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log('Quiz submission result:', result);
+    })
+    .catch(error => {
+        console.error('Error submitting quiz:', error);
+    });
+
+
+}
+    </script>
+
+<script>
+    function movehome() {
+        fetch('/movetohome', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.text())
+        .then(data => {
+            
+            console.log('Moving to home');
+
+            window.location.href = `/homepage.html?name=${data}`;
+        })
+        .catch(error => console.error('Error moving to home:', error));
+    }
+</script>
+</body>
+
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzy - Quiz Details</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" type="text/css" href="css/quizsolutionstyle.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;1,500&family=Roboto:ital,wght@0,300;1,300;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <style>
+        .correct-answer {
+            color: green;
+        }
+
+        .wrong-answer {
+            color: red;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <header>
+        <a href="#" class="logo">Quizzy</a>
+
+        <a onclick="movehome()" style="color: black; font-weight: bold;">Home <i class="fa-solid fa-house"></i></a>
+
+    </header>
+
+    <section>
+        <h1 class="subtitle"><u>Quiz Solution</u></h1>
+        <div id="quizDetailsContainer">
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const quizId = urlParams.get('quizId');
+
+            fetch(`/attemptedquizDetails?quizId=${quizId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(quiz => {
+                    const quizDetailsContainer = document.querySelector('#quizDetailsContainer');
+                    const quizCard = document.createElement('div');
+                    quizCard.classList.add('quiz-details');
+                    quizCard.innerHTML = `
+                        <h2>Name: ${quiz.quizName}</h2>
+                        <h4>Created By: ${quiz.ownerName}</h4>
+                        <h4>Date: ${quiz.attemptedDate}</h4>
+                        <h4>Attempted By: ${quiz.userName}</h4>
+                        <h4>Score: ${quiz.totalScore}</h4>
+                        <h3>Questions:</h3>
+                    `;
+                    quiz.questions.forEach(question => {
+                        const questionDiv = document.createElement('div');
+                        var i=0;
+                        questionDiv.innerHTML = `
+                        <h4>${question.question}</h4>
+                        <p>Options:</p>
+                        <ul>
+                            ${question.options.map(option => {
+                                if (option === question.correctAnswer) {
+                                    i++;
+                                    return `<li class="correct-answer">${i +' -' }    ${option}   <i class="fa-solid fa-check"></i></li>`;
+                                } else if (option === question.choosedAnswer) {
+                                    i++;
+                                    return `<li class="wrong-answer">${i +' -' }    ${option}     <i class="fa-solid fa-xmark"></i></li>`;
+                                } else {
+                                    i++;
+                                    return `<li>${i +' -' }  ${option}</li>`;
+                                }
+                            }).join('')}
+
+                        </ul>
+                        `;
+                        quizCard.appendChild(questionDiv);
+                    });
+                    quizDetailsContainer.appendChild(quizCard);
+                })
+                .catch(error => {
+                    console.error('Error fetching quiz details:', error);
+                });
+        });
+    </script>
+
+<script>
+    function movehome() {
+        fetch('/movetohome', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.text())
+        .then(data => {
+            
+            console.log('Moving to home');
+
+            window.location.href = `/homepage.html?name=${data}`;
+        })
+        .catch(error => console.error('Error moving to home:', error));
+    }
+</script>   
+
+</body>
+
+</html>

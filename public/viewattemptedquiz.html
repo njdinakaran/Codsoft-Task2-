@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quizzy</title>
+
+        <link rel="stylesheet" type="text/css" href="css/viewattemptedquizstyle.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;1,500&family=Roboto:ital,wght@0,300;1,300;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+</head>
+<body>
+    <header>
+        <a href="#" class="logo">Quizzy</a>
+
+        <a onclick="movehome()" style="color: black; font-weight: bold;">Home <i class="fa-solid fa-house"></i></a>
+        
+
+    </header>
+
+        <h3> Attempted Quiz Details</h3>
+        <div id="allquiz" class="quiz-card-container"></div>
+
+
+ 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/attendQuizDetails', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const QuizzesContainer = document.querySelector('#allquiz'); 
+            data.forEach(quiz => {
+                const quizCard = document.createElement('div');
+                quizCard.classList.add('quiz-card');
+                const date = new Date(quiz.attemptedDate);
+                const quizDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                quizCard.innerHTML = `
+                    <h2><a href="/viewsolution.html?quizId=${quiz._id}" target="_blank">${quiz.quizName}</a></h2>
+                    <p><b><u>Created By:</u>${quiz.ownerName}</b></p>
+                    <p><b><u>Date: </u>${quiz.attemptedDate}</b></p>
+                    <p><b><u>Score: </u>${quiz.totalScore}/${quiz.questions.length}</b></p>
+
+                `;
+                QuizzesContainer.appendChild(quizCard);
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching attended quizzes:', error);
+        });
+    });
+</script>
+<script>
+    function movehome() {
+        fetch('/movetohome', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.text())
+        .then(data => {
+            
+            console.log('Moving to home');
+
+            window.location.href = `/homepage.html?name=${data}`;
+        })
+        .catch(error => console.error('Error moving to home:', error));
+    }
+</script>
+
+</body>
+</html>

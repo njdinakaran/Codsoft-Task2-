@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Quiz</title>
+
+    <link rel="stylesheet" type="text/css" href="css/makeqstyle.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;1,500&family=Roboto:ital,wght@0,300;1,300;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+
+
+</head>
+<body>
+
+    <header>
+        <a href="#" class="logo">Quizzy</a>
+
+        <a onclick="movehome()" style="color: black; font-weight: bold;">Home <i class="fa-solid fa-house"></i></a>
+        
+
+    </header>
+    <div class="hero-text">
+        <h1>Create your Own Quiz in few minutes!</h1>
+        </div>
+
+    <div>
+        <label for="quizName">Quiz Name:</label>
+        <input type="text" id="quizName" name="quizName">
+        <br><br>
+        <label for="totalQuestions">Total Questions:</label>
+        <input type="number" id="totalQuestions" name="totalQuestions" min="1">
+        <br><br>
+        <label for="visibility">Quiz Visibility:</label>
+        <select id="visibility" name="visibility" onchange="setVisibility()">
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+        </select>
+        <br><br>
+        <div id="idAndPassword" style="display: none;">
+            <label for="quizId">Quiz ID:</label>
+            <input type="text" id="quizId" name="quizId">
+            <br><br>
+            <label for="quizPassword">Quiz Password:</label>
+            <input type="password" id="quizPassword" name="quizPassword">
+            <br><br>
+        </div>
+        <button onclick="createQuiz()">Create Quiz</button>
+    </div>
+
+    <div id="quizForm">
+    </div>
+
+    <script>
+        function setVisibility() {
+            var visibility = document.getElementById('visibility').value;
+            var idAndPassword = document.getElementById('idAndPassword');
+            if (visibility === 'public') {
+                idAndPassword.style.display = 'none';
+            } else {
+                idAndPassword.style.display = 'block';
+            }
+        }
+    
+        function createQuiz() {
+            var quizName = document.getElementById('quizName').value;
+            var totalQuestions = document.getElementById('totalQuestions').value;
+            var visibility = document.getElementById('visibility').value;
+            var quizId = visibility === 'public' ? null : document.getElementById('quizId').value;
+            var quizPassword = visibility === 'public' ? null : document.getElementById('quizPassword').value;
+            var quizForm = document.getElementById('quizForm');
+            quizForm.innerHTML = ''; 
+
+            if(totalQuestions==0 || quizName==""){
+                alert('Please fill all details')
+            } else if(visibility === 'private' && (quizId === '' || quizPassword === '')) {  
+            alert('Please fill Quiz ID and Quiz Password for private quiz');
+            
+            } else{ 
+                var allQuestionsFilled = true;
+            for (var i = 1; i <= totalQuestions; i++) {
+                var questionLabel = document.createElement('label');
+                questionLabel.innerHTML = 'Question ' + i + ': ';
+                var questionInput = document.createElement('input');
+                questionInput.type = 'text';
+                questionInput.name = 'question' + i;
+                var br = document.createElement('br');
+                quizForm.appendChild(questionLabel);
+                quizForm.appendChild(questionInput);
+                quizForm.appendChild(br);
+    
+                for (var j = 1; j <= 4; j++) {
+                    var optionLabel = document.createElement('label');
+                    optionLabel.innerHTML = 'Option ' + j +': ';
+                    var optionInput = document.createElement('input');
+                    optionInput.type = 'text';
+                    optionInput.name = 'option' + j + 'q' + i;
+                    
+                    var br = document.createElement('br');
+                    quizForm.appendChild(optionLabel);
+                    quizForm.appendChild(optionInput);
+                    quizForm.appendChild(br);
+                }
+    
+                var selectLabel = document.createElement('label');
+                selectLabel.innerHTML = 'Select correct answer ';
+                var selectDropdown = document.createElement('select');
+                selectDropdown.name = 'correctAnswer' + i;
+    
+                for (var k = 1; k <= 4; k++) {
+                    var option = document.createElement('option');
+                    option.value = 'option' + k + 'q' + i;
+                    option.text = 'Option ' + k;
+                    selectDropdown.appendChild(option);
+                }
+    
+                var selectBr = document.createElement('br');
+                quizForm.appendChild(selectLabel);
+                quizForm.appendChild(selectDropdown);
+                quizForm.appendChild(selectBr);
+    
+                var hr = document.createElement('hr');
+                quizForm.appendChild(hr);
+            }
+        
+            var submitButton = document.createElement('button');
+                submitButton.textContent = 'Submit Quiz';
+                quizForm.appendChild(submitButton);
+
+                submitButton.onclick = function() {
+                    if (totalQuestions == 0 || quizName == "") {
+            alert('Please fill all details');
+        } else if (visibility === 'private' && (quizId === '' || quizPassword === '')) {
+            alert('Please fill Quiz ID and Quiz Password for private quiz');
+        } else {
+            var allQuestionsFilled = true;
+            for (var i = 1; i <= totalQuestions; i++) {
+                var question = document.querySelector('input[name="question' + i + '"]').value;
+                if (question == "") {
+                    allQuestionsFilled = false;
+                    break;
+                }
+                for (var j = 1; j <= 4; j++) {
+                    var option = document.querySelector('input[name="option' + j + 'q' + i + '"]').value;
+                    if (option == "") {
+                        allQuestionsFilled = false;
+                        break;
+                    }
+                }
+            }
+
+            if (allQuestionsFilled) {
+                var quizData = {
+                    quizName: quizName,
+                    totalQuestions: totalQuestions,
+                    visibility: visibility,
+                    quizdbId: quizId,
+                    quizPassword: quizPassword,
+                    questions: [],
+                    Date_created: new Date().toLocaleDateString('en-GB')
+                };
+
+                for (var i = 1; i <= totalQuestions; i++) {
+                    var question = document.querySelector('input[name="question' + i + '"]').value;
+                    var inputName = document.querySelector('select[name="correctAnswer' + i + '"]').value;
+                    var value = document.querySelector('input[name="' + inputName + '"]').value;
+                    console.log('Value from chosen input:', value);
+                    var questionData = {
+                        question: question,
+                        options: [],
+                        correctAnswer: value
+                    };
+
+                    for (var j = 1; j <= 4; j++) {
+                        var option = document.querySelector('input[name="option' + j + 'q' + i + '"]').value;
+                        questionData.options.push(option);
+                    }
+
+                    quizData.questions.push(questionData);
+                }
+                alert('Quiz created successfully!');
+
+                fetch('/submitQuizData', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(quizData)
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log(data);
+                    window.location.href = `/homepage.html?name=${data}`;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            } else {
+                alert('Please fill all questions and options');
+            }
+        }
+                }
+        }
+    }
+
+
+
+        
+        
+    
+    </script>
+    <script>
+        function movehome() {
+            fetch('/movetohome', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.text())
+            .then(data => {
+                
+                console.log('Moving to home');
+    
+                window.location.href = `/homepage.html?name=${data}`;
+            })
+            .catch(error => console.error('Error moving to home:', error));
+        }
+    </script>
+    
+</body>
+</html>

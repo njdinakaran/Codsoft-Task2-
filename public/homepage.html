@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quizzy - Homepage</title>
+
+    <link rel="stylesheet" type="text/css" href="css/homepagestyle.css">
+    <link rel="stylesheet" href="https://unpkg.com/boxicons@latest/css/boxicons.min.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,200;1,500&family=Roboto:ital,wght@0,300;1,300;1,700&display=swap" rel="stylesheet">
+
+
+
+
+</head>
+
+<body>
+    
+    <header>
+        <a href="#" class="logo">Quizzy</a>
+
+        <ul class="navlist">
+            <li><a href="#" class="sin">Join a Quiz</a></li>
+            <li><a href="#" class="sup">Create a Quiz</a></li>
+        </ul>
+
+        <div class="bx bx-menu" id="menu-icon"></div>
+    </header>
+
+    <h1 id="myname" class="myhname"></h1>
+
+    <section>
+        <br>
+        <h1 class="subtitle">Recent Quizzes Taken <button onclick="attemptedquizmove()">See All</button> </h1>
+        <div id="recentQuizzesContainer" class="quiz-card-container">
+        </div>    
+    </section>
+    <section>
+        <h1 class="subtitle">Recent Quizzes Created  <button onclick="seeallquiz()">View All</button></h1>
+    
+        <div id="recentQuizzesCreatedContainer" class="quiz-card-container">
+        </div>
+    </section>
+    <section>
+        <br><br>
+        <h1 class="subtitle">Public Quizzes</h1>
+        <div id="publicQuizzesContainer" class="quiz-card-container">
+        </div>
+        <br>
+        <h3>To see more quiz & to join Restricted quiz</h3>
+        <button onclick="takequiz()">Click here</button>
+    </section>
+
+
+    <script>
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+        var name = getParameterByName('name');
+        if (name) {
+            document.getElementById('myname').innerText = 'Welcome ' + name;
+        }
+    </script> 
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/attendQuizDetails', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const recentQuizzesContainer = document.querySelector('#recentQuizzesContainer');
+            if (data.length === 0) {
+            const noQuizMessage = document.createElement('div');
+            noQuizMessage.textContent = "Start your journey by attending some quiz";
+            recentQuizzesContainer.appendChild(noQuizMessage);
+        } else { 
+            const numberOfQuizzesToDisplay = Math.min(data.length, 5);
+                for (let i = 0; i < numberOfQuizzesToDisplay; i++) {
+                const quiz = data[i];
+                const quizCard = document.createElement('div');
+                quizCard.classList.add('quiz-card');
+                const date = new Date(quiz.attemptedDate);
+                const quizDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                quizCard.innerHTML = `
+                    <h2><i>${quiz.quizName}</i></h2>
+                    <p><b><u>Created By:</u> ${quiz.ownerName}</b></p>
+                    <p><b><u>Date:</u> ${quiz.attemptedDate}<b></p>
+                    <p><u>Score:</u><b> ${quiz.totalScore}</b></p>
+                `;
+                recentQuizzesContainer.appendChild(quizCard);
+                    }
+        }
+        })
+        .catch(error => {
+            console.error('Error fetching attended quizzes:', error);
+        });
+    });
+</script>
+<script>
+
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/homequizzesByUser', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const recentQuizzesCreatedContainer = document.querySelector('#recentQuizzesCreatedContainer');
+            if (data.length === 0) {
+            const noQuizMessage = document.createElement('p');
+            noQuizMessage.innerHTML = '<p><a href="makequiz.html">Create your own quiz now</a><p>';
+            recentQuizzesCreatedContainer.appendChild(noQuizMessage);
+            } else { 
+                const numberOfQuizzesToDisplay = Math.min(data.length, 5);
+                for (let i = 0; i < numberOfQuizzesToDisplay; i++) {
+                    const quiz = data[i];
+                  const quizCard = document.createElement('div');
+                quizCard.classList.add('quiz-card');
+                const date = new Date(quiz.createdAt);
+                const quizDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                quizCard.innerHTML = `
+                    <h2><i>${quiz.quizName}</i></h2>
+                    <p><b><u>Date:</u>  ${  quizquiz.Date_created}</b></p>
+                    <p><b><u>Visibility:</u>  ${  quiz.visibility}</b></p>
+                    <p><b><u>Total Questions:</u>  ${  quiz.totalQuestions}</b></p>
+                `;
+                recentQuizzesCreatedContainer.appendChild(quizCard);
+            }
+        }
+        })
+        .catch(error => {
+            console.error('Error fetching created quizzes:', error);
+        });
+    });
+</script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/homequizzesByVisibility?visibility=public', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const publicQuizzesContainer = document.querySelector('#publicQuizzesContainer');
+            if (data.length === 0) {
+            const noQuizMessage = document.createElement('p');
+            noQuizMessage.innerHTML = '<p>No Public Quiz available<p>';
+                publicQuizzesContainer.appendChild(noQuizMessage);
+            } else { 
+                const numberOfQuizzesToDisplay = Math.min(data.length, 5);
+                for (let i = 0; i < numberOfQuizzesToDisplay; i++) {
+                    const quiz = data[i];
+               const quizCard = document.createElement('div');
+                quizCard.classList.add('quiz-card');
+                const date = new Date(quiz.Date_created);
+                const quizDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+                quizCard.innerHTML = `
+                    <h2>Quiz Name: <a href="/attendquiz.html?quizId=${quiz._id}" target="_blank"><i>${quiz.quizName}</i></a></h2>
+                    <p><b><u>Created By:</u>  ${quiz.userName}</b></p>
+                    <p><b><u>Date: </u>    ${quiz.Date_created}</b></p>
+                    <p><b><u>Total Questions: </u>    ${quiz.totalQuestions}</b></p>                    
+                `;
+                publicQuizzesContainer.appendChild(quizCard);
+            }
+        }
+        })
+        .catch(error => {
+            console.error('Error fetching public quizzes:', error);
+        });
+    });
+</script>
+<script>
+    function attemptedquizmove(){
+        window.location.href = "viewattemptedquiz.html";
+
+    }
+    function takequiz(){
+        window.location.href = "takequiz.html";
+
+    }
+    function seeallquiz(){
+        window.location.href = "yourquizzes.html";
+    }
+</script>
+
+<script src="https://unpkg.com/scrollreveal"></script>
+    <script src="js/homescript.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector("li:nth-of-type(1) a").addEventListener("click", function() {
+                window.location.href="takequiz.html";
+            });
+
+            document.querySelector("li:nth-of-type(2) a").addEventListener("click", function() {
+                window.location.href="makequiz.html";
+            });
+
+        });
+    </script>
+    
+</body>
+</html>
